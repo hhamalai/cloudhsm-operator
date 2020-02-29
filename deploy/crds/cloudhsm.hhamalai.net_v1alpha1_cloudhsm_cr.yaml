@@ -1,0 +1,7 @@
+apiVersion: cloudhsm.hhamalai.net/v1alpha1
+kind: CloudHSM
+metadata:
+  name: example-cloudhsm
+spec:
+  # Add fields here
+  size: 3

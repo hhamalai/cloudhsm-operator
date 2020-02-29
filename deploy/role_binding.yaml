@@ -1,0 +1,11 @@
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: cloudhsm-operator
+subjects:
+- kind: ServiceAccount
+  name: cloudhsm-operator
+roleRef:
+  kind: Role
+  name: cloudhsm-operator
+  apiGroup: rbac.authorization.k8s.io
