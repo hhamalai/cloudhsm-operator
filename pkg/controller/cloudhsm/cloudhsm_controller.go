@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
+	"strings"
+	"time"
 
 	cloudhsmv1alpha1 "github.com/hhamalai/cloudhsm-operator/pkg/apis/cloudhsm/v1alpha1"
 	corev1 "k8s.io/api/core/v1"
@@ -23,6 +25,7 @@ import (
 	errs "github.com/pkg/errors"
 )
 
+var REQUEUE_AFTER = 60 * time.Second
 var log = logf.Log.WithName("controller_cloudhsm")
 
 /**
@@ -110,6 +113,9 @@ func (r *ReconcileCloudHSM) Reconcile(request reconcile.Request) (reconcile.Resu
 
 	// Define a new ConfigMap object
 	cm, err := r.newCMForCR(instance)
+	if err != nil {
+		return reconcile.Result{}, err
+	}
 
 	// Set CloudHSM instance as the owner and controller
 	if err := controllerutil.SetControllerReference(instance, cm, r.scheme); err != nil {
@@ -127,14 +133,17 @@ func (r *ReconcileCloudHSM) Reconcile(request reconcile.Request) (reconcile.Resu
 		}
 
 		// CM created successfully - don't requeue
-		return reconcile.Result{}, nil
+		return reconcile.Result{RequeueAfter: REQUEUE_AFTER}, nil
 	} else if err != nil {
 		return reconcile.Result{}, err
 	}
 
-	// CM already exists - don't requeue
-	reqLogger.Info("Skip reconcile: CM already exists", "ConfigMap.Namespace", found.Namespace, "ConfigMap.Name", found.Name)
-	return reconcile.Result{}, nil
+	reqLogger.Info("Updating ConfigMap", "ConfigMap.Namespace", cm.Namespace, "ConfigMap.Name", cm.Name)
+	err = r.client.Update(context.TODO(), cm)
+	if err != nil {
+		return reconcile.Result{}, err
+	}
+	return reconcile.Result{RequeueAfter: REQUEUE_AFTER}, nil
 }
 
 // newPodForCM returns a configmap with CloudHSM description with the same name/namespace as the cr
@@ -154,6 +163,10 @@ func (r *ReconcileCloudHSM) newCMForCR(cr *cloudhsmv1alpha1.CloudHSM) (*corev1.C
 	hsm_ips := make(map[string]string)
 	for i := range data {
 		hsm_ips[fmt.Sprintf("hsm_ip.%d", i)] = aws.StringValue(data[i])
+	}
+	hsm_ips["hsm_ips"] = strings.Join(aws.StringValueSlice(data), ",")
+	if len(data) > 0 {
+		hsm_ips["hsm_first_ip"] = aws.StringValue(data[0])
 	}
 	return &corev1.ConfigMap{
 		ObjectMeta: metav1.ObjectMeta{

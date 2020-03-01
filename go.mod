@@ -3,7 +3,7 @@ module github.com/hhamalai/cloudhsm-operator
 go 1.13
 
 require (
-	github.com/aws/aws-sdk-go v1.17.7
+	github.com/aws/aws-sdk-go v1.25.35
 	github.com/operator-framework/operator-sdk v0.15.2
 	github.com/pkg/errors v0.8.1
 	github.com/spf13/pflag v1.0.5

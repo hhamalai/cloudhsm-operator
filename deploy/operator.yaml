@@ -31,3 +31,7 @@ spec:
                   fieldPath: metadata.name
             - name: OPERATOR_NAME
               value: "cloudhsm-operator"
+            - name: AWS_REGION
+              value: REPLACE_REGION
+      securityContext:
+        fsGroup: 65534
