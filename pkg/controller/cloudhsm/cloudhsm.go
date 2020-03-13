@@ -5,17 +5,34 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudhsmv2"
+	"github.com/aws/aws-sdk-go/service/cloudhsmv2/cloudhsmv2iface"
 )
 
 type Context struct {
 	s  *session.Session
 	ch *cloudhsmv2.CloudHSMV2
+	Client cloudhsmv2iface.CloudHSMV2API
 }
 
 func newContext(s *session.Session) *Context {
 	return &Context{
 		s: s,
 	}
+}
+
+
+func (c *Context) DescribeClusters(clusterId string) (*cloudhsmv2.DescribeClustersOutput, error)  {
+	getCloudHSMInput := &cloudhsmv2.DescribeClustersInput{
+		Filters: map[string][]*string {
+			"clusterIds": aws.StringSlice([]string{clusterId}),
+		},
+	}
+
+	output, err := c.Client.DescribeClusters(getCloudHSMInput)
+	if err != nil {
+		return nil, err
+	}
+	return output, nil
 }
 
 func (c *Context) GetHSMIPs(clusterId string) ([]*string, error) {
@@ -27,22 +44,14 @@ func (c *Context) GetHSMIPs(clusterId string) ([]*string, error) {
 		c.ch = cloudhsmv2.New(c.s)
 	}
 
-	getCloudHSMInput := &cloudhsmv2.DescribeClustersInput{
-		Filters: map[string][]*string {
-			"clusterIds": aws.StringSlice([]string{clusterId}),
-		},
-	}
-
-
-	output, err := c.ch.DescribeClusters(getCloudHSMInput)
+	clusters, err := c.DescribeClusters(clusterId)
 	if err != nil {
 		return nil, err
 	}
 
 	var hsm_ips []*string
-
-	for c := range output.Clusters {
-		hsms := output.Clusters[c].Hsms
+	for c := range clusters.Clusters {
+		hsms := clusters.Clusters[c].Hsms
 		for h := range hsms {
 			hsm_ips = append(hsm_ips, hsms[h].EniIp)
 		}
