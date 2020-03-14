@@ -36,7 +36,7 @@ spec:
               format: int32
               type: integer
             clusterId:
-              description 'CloudHSM cluster ID to manage'
+              description: 'CloudHSM cluster ID to manage'
               type: string
           required:
           - clusterId

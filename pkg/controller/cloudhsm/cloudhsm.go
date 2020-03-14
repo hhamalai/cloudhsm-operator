@@ -22,6 +22,9 @@ func newContext(s *session.Session) *Context {
 
 
 func (c *Context) DescribeClusters(clusterId string) (*cloudhsmv2.DescribeClustersOutput, error)  {
+	if c.Client == nil {
+		c.Client = c.ch
+	}
 	getCloudHSMInput := &cloudhsmv2.DescribeClustersInput{
 		Filters: map[string][]*string {
 			"clusterIds": aws.StringSlice([]string{clusterId}),
