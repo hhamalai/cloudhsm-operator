@@ -31,16 +31,11 @@ spec:
         spec:
           description: CloudHSMSpec defines the desired state of CloudHSM
           properties:
-            size:
-              description: 'Desired number of CloudHSM devices in cluster'
-              format: int32
-              type: integer
             clusterId:
               description: 'CloudHSM cluster ID to manage'
               type: string
           required:
           - clusterId
-          - size
           type: object
         status:
           description: CloudHSMStatus defines the observed state of CloudHSM

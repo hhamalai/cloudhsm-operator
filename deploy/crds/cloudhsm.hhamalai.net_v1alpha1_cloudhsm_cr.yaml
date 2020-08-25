@@ -4,4 +4,4 @@ metadata:
   name: example-cloudhsm
 spec:
   # Add fields here
-  size: 3
+  clusterId: cluster-xxxxxxx

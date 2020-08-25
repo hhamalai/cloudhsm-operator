@@ -1,7 +1,6 @@
 package cloudhsm
 
 import (
-	"fmt"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudhsmv2"
@@ -55,12 +54,12 @@ func (c *Context) GetHSMIPs(clusterId string) ([]*string, error) {
 	var hsm_ips []*string
 	for c := range clusters.Clusters {
 		hsms := clusters.Clusters[c].Hsms
-		for h := range hsms {
-			hsm_ips = append(hsm_ips, hsms[h].EniIp)
+		for _, hsm := range hsms {
+			if aws.StringValue(hsm.State) == cloudhsmv2.HsmStateActive {
+				hsm_ips = append(hsm_ips, hsm.EniIp)
+			}
 		}
 	}
-
-	fmt.Println("List of HSM IPs", hsm_ips)
 
 	return hsm_ips, nil
 }

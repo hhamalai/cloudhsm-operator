@@ -13,7 +13,6 @@ type CloudHSMSpec struct {
 	// Important: Run "operator-sdk generate k8s" to regenerate code after modifying this file
 	// Add custom validation using kubebuilder tags: https://book-v1.book.kubebuilder.io/beyond_basics/generating_crd.html
 	ClusterId string `json:"clusterId"`
-	Size int32 `json:"size"`
 }
 
 // CloudHSMStatus defines the observed state of CloudHSM

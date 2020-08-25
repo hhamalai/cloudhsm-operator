@@ -109,7 +109,7 @@ func (r *ReconcileCloudHSM) Reconcile(request reconcile.Request) (reconcile.Resu
 		return reconcile.Result{}, err
 	}
 
-	reqLogger.Info("cloudhsm operator reconciling", "ClusterId", instance.Spec.ClusterId, "ClusterSize", instance.Spec.Size)
+	reqLogger.Info("cloudhsm operator reconciling", "ClusterId", instance.Spec.ClusterId)
 
 	// Define a new ConfigMap object
 	cm, err := r.newCMForCR(instance)
@@ -146,7 +146,7 @@ func (r *ReconcileCloudHSM) Reconcile(request reconcile.Request) (reconcile.Resu
 	return reconcile.Result{RequeueAfter: REQUEUE_AFTER}, nil
 }
 
-// newPodForCM returns a configmap with CloudHSM description with the same name/namespace as the cr
+// returns a configmap with CloudHSM description with the same name/namespace as the cr
 func (r *ReconcileCloudHSM) newCMForCR(cr *cloudhsmv1alpha1.CloudHSM) (*corev1.ConfigMap, error) {
 	labels := map[string]string{
 		"app": cr.Name,

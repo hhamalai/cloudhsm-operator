@@ -36,8 +36,15 @@ func TestGetHSMIPs(t *testing.T) {
 				Clusters: []*cloudhsmv2.Cluster{
 					{
 						Hsms: []*cloudhsmv2.Hsm{
-							{EniIp: aws.String("10.10.10.1")},
-							{EniIp: aws.String("10.10.10.2")},
+							{
+								EniIp: aws.String("10.10.10.1"),
+								State: aws.String(cloudhsmv2.HsmStateActive),
+							},
+							{
+								EniIp: aws.String("10.10.10.2"),
+								State: aws.String(cloudhsmv2.HsmStateActive),
+							},
+
 						},
 					},
 				},
@@ -46,6 +53,33 @@ func TestGetHSMIPs(t *testing.T) {
 			Expected: []*string{
 				aws.String("10.10.10.1"),
 				aws.String("10.10.10.2"),
+			},
+		},
+		{
+			Description: "Lists only active HSM device IPs",
+			Resp: &cloudhsmv2.DescribeClustersOutput{
+				Clusters: []*cloudhsmv2.Cluster{
+					{
+						Hsms: []*cloudhsmv2.Hsm{
+							{
+								EniIp: aws.String("10.10.10.1"),
+								State: aws.String(cloudhsmv2.HsmStateActive),
+							},
+							{
+								EniIp: aws.String("10.10.10.2"),
+								State: aws.String(cloudhsmv2.HsmStateCreateInProgress),
+							},
+							{
+								EniIp: aws.String("10.10.10.3"),
+								State: aws.String(cloudhsmv2.HsmStateDegraded),
+							},
+						},
+					},
+				},
+			},
+			Error: nil,
+			Expected: []*string{
+				aws.String("10.10.10.1"),
 			},
 		},
 		{
@@ -77,7 +111,7 @@ func TestGetHSMIPs(t *testing.T) {
 		}
 		for j, msg := range msgs {
 			if a, e := msg, c.Expected[j]; aws.StringValue(a) != aws.StringValue(e) {
-				t.Errorf("%d, expected %s message, got %s", i, aws.StringValue(e), aws.StringValue(a))
+				t.Errorf("%s: expected %s message, got %s", c.Description, aws.StringValue(e), aws.StringValue(a))
 			}
 		}
 	}
