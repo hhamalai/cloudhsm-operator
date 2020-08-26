@@ -1,0 +1,24 @@
+# permissions for end users to edit cloudhsms.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cloudhsm-editor-role
+rules:
+- apiGroups:
+  - cloudhsm.hhamalai.net
+  resources:
+  - cloudhsms
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - cloudhsm.hhamalai.net
+  resources:
+  - cloudhsms/status
+  verbs:
+  - get

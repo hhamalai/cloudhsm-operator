@@ -1,0 +1,11 @@
+domain: hhamalai.net
+layout: go.kubebuilder.io/v2
+projectName: cloudhsm-operator-new
+repo: github.com/hhamalai/cloudhsm-operator
+resources:
+- group: cloudhsm
+  kind: CloudHSM
+  version: v1alpha1
+version: 3-alpha
+plugins:
+  go.sdk.operatorframework.io/v2-alpha: {}
