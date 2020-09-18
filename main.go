@@ -60,7 +60,7 @@ func main() {
 		MetricsBindAddress: metricsAddr,
 		Port:               9443,
 		LeaderElection:     enableLeaderElection,
-		LeaderElectionID:   "cloudhsm.hhamalai.net",
+		LeaderElectionID:   "cloudhsm-operator-leader-election",
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")

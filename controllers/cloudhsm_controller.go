@@ -55,7 +55,6 @@ var RequeueAfter = 60 * time.Second
 func (r *CloudHSMReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
 	log := r.Log.WithValues("cloudhsm", req.NamespacedName)
-	log.Info("Reconciling CloudHSM")
 
 	// Fetch the CloudHSM instance
 	instance := &cloudhsmv1alpha1.CloudHSM{}
@@ -71,7 +70,7 @@ func (r *CloudHSMReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 		return reconcile.Result{}, err
 	}
 
-	log.Info("cloudhsm operator reconciling", "ClusterId", instance.Spec.ClusterId)
+	log.Info("CloudHSM operator reconciling", "ClusterId", instance.Spec.ClusterId)
 
 	// Define a new ConfigMap object
 	cm, err := r.newCMForCR(instance)
