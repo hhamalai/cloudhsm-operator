@@ -52,13 +52,12 @@ var RequeueAfter = 60 * time.Second
 // +kubebuilder:rbac:groups=cloudhsm.hhamalai.net,resources=cloudhsms;configmaps,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=cloudhsm.hhamalai.net,resources=cloudhsms/status,verbs=get;update;patch
 
-func (r *CloudHSMReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	_ = context.Background()
+func (r *CloudHSMReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := r.Log.WithValues("cloudhsm", req.NamespacedName)
 
 	// Fetch the CloudHSM instance
 	instance := &cloudhsmv1alpha1.CloudHSM{}
-	err := r.Client.Get(context.TODO(), req.NamespacedName, instance)
+	err := r.Client.Get(ctx, req.NamespacedName, instance)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			// Request object not found, could have been deleted after reconcile request.
@@ -85,10 +84,10 @@ func (r *CloudHSMReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 	// Check if this CM already exists
 	found := &corev1.ConfigMap{}
-	err = r.Client.Get(context.TODO(), types.NamespacedName{Name: cm.Name, Namespace: cm.Namespace}, found)
+	err = r.Client.Get(ctx, types.NamespacedName{Name: cm.Name, Namespace: cm.Namespace}, found)
 	if err != nil && errors.IsNotFound(err) {
 		log.Info("Creating a new ConfigMap", "ConfigMap.Namespace", cm.Namespace, "ConfigMap.Name", cm.Name)
-		err = r.Client.Create(context.TODO(), cm)
+		err = r.Client.Create(ctx, cm)
 		if err != nil {
 			return reconcile.Result{}, err
 		}
@@ -100,7 +99,7 @@ func (r *CloudHSMReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	}
 
 	log.Info("Updating ConfigMap", "ConfigMap.Namespace", cm.Namespace, "ConfigMap.Name", cm.Name)
-	err = r.Client.Update(context.TODO(), cm)
+	err = r.Client.Update(ctx, cm)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
